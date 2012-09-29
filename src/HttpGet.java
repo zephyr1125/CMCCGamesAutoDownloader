@@ -15,7 +15,8 @@ public class HttpGet {
 	private static int BUFFER_SIZE = 8096;// 缓冲区大小
 	private Vector<String> vDownLoad = new Vector<String>();// URL列表
 	private Vector<String> vFileList = new Vector<String>();// 下载后的保存文件名列表
-
+	private Vector<Boolean> vIsDownloadWholeFile = new Vector<Boolean>();// 是要下载完整文件，还是只下一点就好
+	
 	/**
 	 * 构造方法
 	 */
@@ -39,9 +40,10 @@ public class HttpGet {
 	 *            String
 	 */
 
-	public void addItem(String url, String filename) {
+	public void addItem(String url, String filename, boolean isDownloadWholeFile) {
 		vDownLoad.add(url);
 		vFileList.add(filename);
+		vIsDownloadWholeFile.add(isDownloadWholeFile);
 	}
 
 	/**
@@ -50,14 +52,15 @@ public class HttpGet {
 	public void downLoadByList() {
 		String url = null;
 		String filename = null;
+		boolean isDownloadWholeFile = true;
 
 		// 按列表顺序保存资源
 		for (int i = 0; i < vDownLoad.size(); i++) {
-			url = (String) vDownLoad.get(i);
-			filename = (String) vFileList.get(i);
-
+			url = vDownLoad.get(i);
+			filename = vFileList.get(i);
+			isDownloadWholeFile = vIsDownloadWholeFile.get(i);
 			try {
-				saveToFile(url, filename);
+				saveToFile(url, filename, isDownloadWholeFile);
 			} catch (IOException err) {
 				if (DEBUG) {
 					System.out.println("资源[" + url + "]下载失败!!!");
@@ -79,7 +82,7 @@ public class HttpGet {
 	 *            String
 	 * @throws Exception
 	 */
-	public void saveToFile(String destUrl, String fileName) throws IOException {
+	public void saveToFile(String destUrl, String fileName, boolean isDownloadWholeFile) throws IOException {
 		FileOutputStream fos = null;
 		BufferedInputStream bis = null;
 		HttpURLConnection httpUrl = null;
@@ -98,13 +101,15 @@ public class HttpGet {
 		fos = new FileOutputStream(fileName);
 
 		if (DEBUG)
-//			System.out.println("正在获取链接[" + destUrl + "]的内容...\n将其保存为文件["
-//					+ fileName + "]");
-			System.out.println("[" + fileName + "]");
+			System.out.println("正在获取链接[" + destUrl + "]的内容...\n将其保存为文件["
+					+ fileName + "]");
+//			System.out.println("[" + fileName + "]");
 
 		// 保存文件
-		while ((size = bis.read(buf)) != -1)
+		do{
+			size = bis.read(buf);
 			fos.write(buf, 0, size);
+		}while(isDownloadWholeFile && size != -1);
 
 		fos.close();
 		bis.close();

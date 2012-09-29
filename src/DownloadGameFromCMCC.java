@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Random;
 
 
 public class DownloadGameFromCMCC implements Runnable{
@@ -32,10 +33,16 @@ public class DownloadGameFromCMCC implements Runnable{
 			try {
 				oInstance.resetList();
 				// 增加下载列表（此处用户可以写入自己代码来增加下载列表）
-				oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=23520&downfrom=www",
-						"./艾格.apk");
-				oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=22184&downfrom=www",
-						"./超时空.apk");
+				
+				Random rdm = new Random();			
+				int rdmPhoneNo = 10000000+rdm.nextInt(89999999);
+				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+						"./艾格.apk", true);
+//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
+//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+//						"./艾格2.apk", false);
+//				oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=22184&downfrom=www",
+//						"./超时空.apk");
 				// 开始下载
 				oInstance.downLoadByList();
 			} catch (Exception err) {
