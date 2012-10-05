@@ -15,7 +15,7 @@ public class HttpGet {
 	private static int BUFFER_SIZE = 8096;// 缓冲区大小
 	private Vector<String> vDownLoad = new Vector<String>();// URL列表
 	private Vector<String> vFileList = new Vector<String>();// 下载后的保存文件名列表
-	private Vector<Boolean> vIsDownloadWholeFile = new Vector<Boolean>();// 是要下载完整文件，还是只下一点就好
+	private Vector<Long> vFileDownloadSize = new Vector<Long>();// 要下载的文件的部分大小，0表示全下
 	
 	/**
 	 * 构造方法
@@ -40,10 +40,10 @@ public class HttpGet {
 	 *            String
 	 */
 
-	public void addItem(String url, String filename, boolean isDownloadWholeFile) {
+	public void addItem(String url, String filename, long fileDownloadSize) {
 		vDownLoad.add(url);
 		vFileList.add(filename);
-		vIsDownloadWholeFile.add(isDownloadWholeFile);
+		vFileDownloadSize.add(fileDownloadSize);
 	}
 
 	/**
@@ -52,20 +52,23 @@ public class HttpGet {
 	public void downLoadByList() {
 		String url = null;
 		String filename = null;
-		boolean isDownloadWholeFile = true;
+		long fileDownloadSize = 0;
 
 		// 按列表顺序保存资源
 		for (int i = 0; i < vDownLoad.size(); i++) {
+			IPChanger.connect("办公室", "200000939537", "f3v8e8w4");
+			DownloadGameFromCMCC.getAllLocalIP();
 			url = vDownLoad.get(i);
 			filename = vFileList.get(i);
-			isDownloadWholeFile = vIsDownloadWholeFile.get(i);
+			fileDownloadSize = vFileDownloadSize.get(i);
 			try {
-				saveToFile(url, filename, isDownloadWholeFile);
+				saveToFile(url, filename, fileDownloadSize);
 			} catch (IOException err) {
 				if (DEBUG) {
 					System.out.println("资源[" + url + "]下载失败!!!");
 				}
 			}
+			IPChanger.disconnect();
 		}
 
 		if (DEBUG) {
@@ -82,17 +85,20 @@ public class HttpGet {
 	 *            String
 	 * @throws Exception
 	 */
-	public void saveToFile(String destUrl, String fileName, boolean isDownloadWholeFile) throws IOException {
+	public void saveToFile(String destUrl, String fileName, long fileDownloadSize) throws IOException {
 		FileOutputStream fos = null;
 		BufferedInputStream bis = null;
 		HttpURLConnection httpUrl = null;
 		URL url = null;
 		byte[] buf = new byte[BUFFER_SIZE];
 		int size = 0;
+		int sizeAll = 0;
 
 		// 建立链接
 		url = new URL(destUrl);
 		httpUrl = (HttpURLConnection) url.openConnection();
+		httpUrl.setConnectTimeout(30*1000);
+		httpUrl.setReadTimeout(30*1000);
 		// 连接指定的资源
 		httpUrl.connect();
 		// 获取网络输入流
@@ -109,7 +115,10 @@ public class HttpGet {
 		do{
 			size = bis.read(buf);
 			fos.write(buf, 0, size);
-		}while(isDownloadWholeFile && size != -1);
+			sizeAll+=size;
+		}while((sizeAll<fileDownloadSize || fileDownloadSize==0) && size != -1);
+		
+		System.out.println("sizeAll="+sizeAll);
 
 		fos.close();
 		bis.close();

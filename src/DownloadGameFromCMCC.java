@@ -12,6 +12,8 @@ public class DownloadGameFromCMCC implements Runnable{
 
 	private long downloadStartTime;
 	
+	private int TIMES = 10000;
+	
 //	private static final long DOWNLOAD_INTERVAL_TIME = 300000;
 	
 	/**
@@ -26,18 +28,24 @@ public class DownloadGameFromCMCC implements Runnable{
 	public void run() {
 		HttpGet oInstance = new HttpGet();
 		int times = 0;
-		while(true){
-			IPChanger.connect("办公室", "200000939537", "f3v8e8w4");
-			getAllLocalIP();
+		while(times<TIMES){
 			downloadStartTime = System.currentTimeMillis();
 			try {
 				oInstance.resetList();
 				// 增加下载列表（此处用户可以写入自己代码来增加下载列表）
-				
 				Random rdm = new Random();			
 				int rdmPhoneNo = 10000000+rdm.nextInt(89999999);
 				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-						"./艾格.apk", true);
+						"./艾格.apk", 0);
+//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
+//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+//						"./艾格64K.apk", 65536);
+//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
+//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+//						"./艾格128K.apk", 131072);
+//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
+//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+//						"./艾格1M.apk", 1048576);
 //				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
 //				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
 //						"./艾格2.apk", false);
@@ -51,7 +59,6 @@ public class DownloadGameFromCMCC implements Runnable{
 			times++;
 			long timeTakes = System.currentTimeMillis()-downloadStartTime;
 			System.out.println("第"+times+"次下载完成，耗时"+timeTakes/1000+"秒");
-			IPChanger.disconnect();
 //			try {
 //				Thread.sleep(DOWNLOAD_INTERVAL_TIME-timeTakes);
 //			} catch (InterruptedException e) {
