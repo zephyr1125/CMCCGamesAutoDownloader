@@ -12,7 +12,12 @@ public class DownloadGameFromCMCC implements Runnable{
 
 	private long downloadStartTime;
 	
-	private int TIMES = 10000;
+	private int TIMES = 512;
+	
+	/**ç›®å‰åªè¦å¹¿ä¸œçœçš„å·æ®µ*/
+	private static final String PROVINCE_NAME = "guangdong";
+	
+	private ProvinceData provinceGuangdong,provinceShandong;
 	
 //	private static final long DOWNLOAD_INTERVAL_TIME = 300000;
 	
@@ -28,37 +33,46 @@ public class DownloadGameFromCMCC implements Runnable{
 	public void run() {
 		HttpGet oInstance = new HttpGet();
 		int times = 0;
+		
+		provinceGuangdong = new ProvinceData(PROVINCE_NAME);
+		
+		provinceShandong = new ProvinceData("shandong");
+		
+		// å¢åŠ ä¸‹è½½åˆ—è¡¨ï¼ˆæ­¤å¤„ç”¨æˆ·å¯ä»¥å†™å…¥è‡ªå·±ä»£ç æ¥å¢åŠ ä¸‹è½½åˆ—è¡¨ï¼‰
+		
 		while(times<TIMES){
+			oInstance.resetList();
+			//ä½¿ç”¨åŒä¸€ä¸ªæ‰‹æœºå·ä¸‹è½½æ–‡ä»¶å¤´
+//			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053138&F=963375_963376&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=cf90e063ba156463e7bc8c12686e57a0",
+//					"./æ·±æµ·head.apk", false, 8*1024, false);
+//			//ä½¿ç”¨åŒä¸€ä¸ªæ‰‹æœºå·ä¸‹è½½æ–‡ä»¶å°¾
+//			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053138&F=963375_963376&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=cf90e063ba156463e7bc8c12686e57a0",
+//					"./æ·±æµ·tail.apk", false, 8*1024, true);
+			
+//			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O="
+//					+provinceGuangdong.randomPhoneNo()
+//					+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
+//					"./è‰¾æ ¼.apk", false, 0, false);
+			
+			//æˆ˜ç«
+			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=651310055114&F=1016354_1016355&T=1&O="
+					+provinceShandong.randomPhoneNo()
+					+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=57a74027464e843e33e1f5100835b1ff");
+			
+//			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053138&F=963375_963376&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=cf90e063ba156463e7bc8c12686e57a0",
+//					"./æ·±æµ·.apk", false, 0, false);
+//			oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510046743&F=867904_867905&T=1&O="+provinceGuangdong.randomPhoneNo()+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=12051985be6020cc568b17bbe9436443",
+//					"./è¶…æ—¶ç©º.apk", false, 0, false);
 			downloadStartTime = System.currentTimeMillis();
 			try {
-				oInstance.resetList();
-				// Ôö¼ÓÏÂÔØÁĞ±í£¨´Ë´¦ÓÃ»§¿ÉÒÔĞ´Èë×Ô¼º´úÂëÀ´Ôö¼ÓÏÂÔØÁĞ±í£©
-				Random rdm = new Random();			
-				int rdmPhoneNo = 10000000+rdm.nextInt(89999999);
-				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-						"./°¬¸ñ.apk", 0);
-//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
-//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-//						"./°¬¸ñ64K.apk", 65536);
-//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
-//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-//						"./°¬¸ñ128K.apk", 131072);
-//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
-//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-//						"./°¬¸ñ1M.apk", 1048576);
-//				rdmPhoneNo = 10000000+rdm.nextInt(89999999);
-//				oInstance.addItem("http://download.cmgame.com:8513/entry?C=0300000001&ContentID=653510053354&F=963379_992854&T=1&O=136"+rdmPhoneNo+"&D=0&Y=2&H=10011000&M=0&P=1&G=0&U=0&E=6118&CFM=1&GCT=0&S=2d0549898a8fae5e335a49bce4b464f1",
-//						"./°¬¸ñ2.apk", false);
-//				oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=22184&downfrom=www",
-//						"./³¬Ê±¿Õ.apk");
-				// ¿ªÊ¼ÏÂÔØ
+				// å¼€å§‹ä¸‹è½½
 				oInstance.downLoadByList();
 			} catch (Exception err) {
-				System.out.println(err.getMessage());
+				err.printStackTrace();
 			}
 			times++;
 			long timeTakes = System.currentTimeMillis()-downloadStartTime;
-			System.out.println("µÚ"+times+"´ÎÏÂÔØÍê³É£¬ºÄÊ±"+timeTakes/1000+"Ãë");
+			System.out.println("ç¬¬"+times+"æ¬¡ä¸‹è½½å®Œæˆï¼Œè€—æ—¶"+timeTakes/1000+"ç§’");
 //			try {
 //				Thread.sleep(DOWNLOAD_INTERVAL_TIME-timeTakes);
 //			} catch (InterruptedException e) {

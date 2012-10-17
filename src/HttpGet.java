@@ -3,7 +3,7 @@ import java.net.*;
 import java.util.*;
 
 /**
- * <p>Title: ¸öÈË¿ª·¢µÄAPI</p> <p>Description: ½«Ö¸¶¨µÄHTTPÍøÂç×ÊÔ´ÔÚ±¾µØÒÔÎÄ¼şĞÎÊ½´æ·Å</p>
+ * <p>Title: ä¸ªäººå¼€å‘çš„API</p> <p>Description: å°†æŒ‡å®šçš„HTTPç½‘ç»œèµ„æºåœ¨æœ¬åœ°ä»¥æ–‡ä»¶å½¢å¼å­˜æ”¾</p>
  * <p>Copyright: Copyright (c) 2004</p> <p>Company: NewSky</p>
  * 
  * @author MagicLiao
@@ -11,28 +11,25 @@ import java.util.*;
  */
 public class HttpGet {
 
-	public final static boolean DEBUG = true;// µ÷ÊÔÓÃ
-	private static int BUFFER_SIZE = 8096;// »º³åÇø´óĞ¡
-	private Vector<String> vDownLoad = new Vector<String>();// URLÁĞ±í
-	private Vector<String> vFileList = new Vector<String>();// ÏÂÔØºóµÄ±£´æÎÄ¼şÃûÁĞ±í
-	private Vector<Long> vFileDownloadSize = new Vector<Long>();// ÒªÏÂÔØµÄÎÄ¼şµÄ²¿·Ö´óĞ¡£¬0±íÊ¾È«ÏÂ
+	public final static boolean DEBUG = true;// è°ƒè¯•ç”¨
+	private static int BUFFER_SIZE = 8096;// ç¼“å†²åŒºå¤§å°
+	private Vector<String> vDownLoad = new Vector<String>();// URLåˆ—è¡¨
 	
 	/**
-	 * ¹¹Ôì·½·¨
+	 * æ„é€ æ–¹æ³•
 	 */
 	public HttpGet() {
 	}
 
 	/**
-	 * Çå³ıÏÂÔØÁĞ±í
+	 * æ¸…é™¤ä¸‹è½½åˆ—è¡¨
 	 */
 	public void resetList() {
 		vDownLoad.clear();
-		vFileList.clear();
 	}
 
 	/**
-	 * Ôö¼ÓÏÂÔØÁĞ±íÏî
+	 * å¢åŠ ä¸‹è½½åˆ—è¡¨é¡¹
 	 * 
 	 * @param url
 	 *            String
@@ -40,44 +37,43 @@ public class HttpGet {
 	 *            String
 	 */
 
-	public void addItem(String url, String filename, long fileDownloadSize) {
+	public void addItem(String url) {
 		vDownLoad.add(url);
-		vFileList.add(filename);
-		vFileDownloadSize.add(fileDownloadSize);
 	}
 
 	/**
-	 * ¸ù¾İÁĞ±íÏÂÔØ×ÊÔ´
+	 * æ ¹æ®åˆ—è¡¨ä¸‹è½½èµ„æº
 	 */
 	public void downLoadByList() {
 		String url = null;
-		String filename = null;
-		long fileDownloadSize = 0;
 
-		// °´ÁĞ±íË³Ğò±£´æ×ÊÔ´
+		// æŒ‰åˆ—è¡¨é¡ºåºä¿å­˜èµ„æº
 		for (int i = 0; i < vDownLoad.size(); i++) {
-			IPChanger.connect("°ì¹«ÊÒ", "200000939537", "f3v8e8w4");
-			DownloadGameFromCMCC.getAllLocalIP();
+//			isIPChange = vIsIPChange.get(i);
+//			if(isIPChange){
+//				IPChanger.connect("åŠå…¬å®¤", "200000939537", "f3v8e8w4");
+//				DownloadGameFromCMCC.getAllLocalIP();
+//			}
+			
 			url = vDownLoad.get(i);
-			filename = vFileList.get(i);
-			fileDownloadSize = vFileDownloadSize.get(i);
+			
 			try {
-				saveToFile(url, filename, fileDownloadSize);
+				saveToFile(url);
 			} catch (IOException err) {
 				if (DEBUG) {
-					System.out.println("×ÊÔ´[" + url + "]ÏÂÔØÊ§°Ü!!!");
+					System.out.println("èµ„æº[" + url + "]ä¸‹è½½å¤±è´¥!!!");
 				}
 			}
-			IPChanger.disconnect();
+//			if(isIPChange)IPChanger.disconnect();
 		}
 
 		if (DEBUG) {
-			System.out.println("ÏÂÔØÍê³É!!!");
+			System.out.println("ä¸‹è½½å®Œæˆ!!!");
 		}
 	}
 
 	/**
-	 * ½«HTTP×ÊÔ´Áí´æÎªÎÄ¼ş
+	 * å°†HTTPèµ„æºå¦å­˜ä¸ºæ–‡ä»¶
 	 * 
 	 * @param destUrl
 	 *            String
@@ -85,8 +81,7 @@ public class HttpGet {
 	 *            String
 	 * @throws Exception
 	 */
-	public void saveToFile(String destUrl, String fileName, long fileDownloadSize) throws IOException {
-		FileOutputStream fos = null;
+	public void saveToFile(String destUrl) throws IOException {
 		BufferedInputStream bis = null;
 		HttpURLConnection httpUrl = null;
 		URL url = null;
@@ -94,65 +89,93 @@ public class HttpGet {
 		int size = 0;
 		int sizeAll = 0;
 
-		// ½¨Á¢Á´½Ó
+		// å»ºç«‹é“¾æ¥
 		url = new URL(destUrl);
 		httpUrl = (HttpURLConnection) url.openConnection();
 		httpUrl.setConnectTimeout(30*1000);
 		httpUrl.setReadTimeout(30*1000);
-		// Á¬½ÓÖ¸¶¨µÄ×ÊÔ´
+		
+		setHeader(httpUrl);
+		
+//		if(isOnlyDownloadTail){
+//	        //è®¾ç½®ä¸‹è½½èµ·å§‹ä½ç½®
+//	        String property = "bytes=" + (fileLength-fileDownloadSize) + "-";
+//	        httpUrl.setRequestProperty("RANGE", property);
+//		}
+		
+		// è¿æ¥æŒ‡å®šçš„èµ„æº
 		httpUrl.connect();
-		// »ñÈ¡ÍøÂçÊäÈëÁ÷
+		// è·å–ç½‘ç»œè¾“å…¥æµ
 		bis = new BufferedInputStream(httpUrl.getInputStream());
-		// ½¨Á¢ÎÄ¼ş
-		fos = new FileOutputStream(fileName);
 
 		if (DEBUG)
-			System.out.println("ÕıÔÚ»ñÈ¡Á´½Ó[" + destUrl + "]µÄÄÚÈİ...\n½«Æä±£´æÎªÎÄ¼ş["
-					+ fileName + "]");
+			System.out.println("æ­£åœ¨è·å–é“¾æ¥[" + destUrl + "]çš„å†…å®¹...");
 //			System.out.println("[" + fileName + "]");
 
-		// ±£´æÎÄ¼ş
+		// ä¿å­˜æ–‡ä»¶
 		do{
 			size = bis.read(buf);
-			fos.write(buf, 0, size);
+//			fos.write(buf, 0, size);
 			sizeAll+=size;
-		}while((sizeAll<fileDownloadSize || fileDownloadSize==0) && size != -1);
+		}while(size != -1);
 		
 		System.out.println("sizeAll="+sizeAll);
 
-		fos.close();
 		bis.close();
 		httpUrl.disconnect();
 	}
+	
+    /**
+     * <b>function:</b> è®¾ç½®URLConnectionçš„å¤´éƒ¨ä¿¡æ¯ï¼Œä¼ªè£…è¯·æ±‚ä¿¡æ¯
+     * @author hoojo
+     * @createDate 2011-9-28 ä¸‹åˆ05:29:43
+     * @param con
+     */
+    private static void setHeader(URLConnection conn) {
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; U; Android 2.2; zh-cn; MotoA953 Build/MILS2_U6_2.2.16) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+        conn.setRequestProperty("Accept-Language", "en-us,en;q=0.7,zh-cn;q=0.3");
+        conn.setRequestProperty("Accept-Encoding", "utf-8");
+        conn.setRequestProperty("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+        conn.setRequestProperty("Keep-Alive", "300");
+        conn.setRequestProperty("connnection", "keep-alive");
+        conn.setRequestProperty("If-Modified-Since", "Fri, 02 Jan 2009 17:00:05 GMT");
+        conn.setRequestProperty("If-None-Match", "\"1261d8-4290-df64d224\"");
+        conn.setRequestProperty("Cache-conntrol", "max-age=0");
+        conn.setRequestProperty("Referer", "http://www.baidu.com");
+    }
 
-	/**
-	 * Ö÷·½·¨(ÓÃÓÚ²âÊÔ)
-	 * 
-	 * @param argv
-	 *            String[]
-	 */
-//	public static void main(String argv[]) {
-//		HttpGet oInstance = new HttpGet();
-//		try {
-//			// Ôö¼ÓÏÂÔØÁĞ±í£¨´Ë´¦ÓÃ»§¿ÉÒÔĞ´Èë×Ô¼º´úÂëÀ´Ôö¼ÓÏÂÔØÁĞ±í£©
-//			oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=23520&downfrom=www",
-//					"./°¬¸ñ.apk");
-//			oInstance.addItem("http://g.10086.cn/e/DownSys/GetDown/game.php?classid=5830&id=22184&downfrom=www",
-//					"./³¬Ê±¿Õ.apk");
-////			oInstance.addItem("http://www.ebook.com/java/ÍøÂç±à³Ì003.zip",
-////					"./ÍøÂç±à³Ì3.zip");
-////			oInstance.addItem("http://www.ebook.com/java/ÍøÂç±à³Ì004.zip",
-////					"./ÍøÂç±à³Ì4.zip");
-////			oInstance.addItem("http://www.ebook.com/java/ÍøÂç±à³Ì005.zip",
-////					"./ÍøÂç±à³Ì5.zip");
-////			oInstance.addItem("http://www.ebook.com/java/ÍøÂç±à³Ì006.zip",
-////					"./ÍøÂç±à³Ì6.zip");
-////			oInstance.addItem("http://www.ebook.com/java/ÍøÂç±à³Ì007.zip",
-////					"./ÍøÂç±à³Ì7.zip");
-//			// ¿ªÊ¼ÏÂÔØ
-//			oInstance.downLoadByList();
-//		} catch (Exception err) {
-//			System.out.println(err.getMessage());
-//		}
-//	}
+    /**
+     * <b>function:</b> è·å–ä¸‹è½½æ–‡ä»¶çš„é•¿åº¦
+     * @author hoojo
+     * @createDate 2011-9-26 ä¸‹åˆ12:15:08
+     * @return
+     */
+    private long getFileSize(String urlText) {
+        int fileLength = -1;
+        try {
+            URL url = new URL(urlText);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            
+            setHeader(conn);
+ 
+            int stateCode = conn.getResponseCode();
+            //åˆ¤æ–­http statusæ˜¯å¦ä¸ºHTTP/1.1 206 Partial Contentæˆ–è€…200 OK
+            if (stateCode != HttpURLConnection.HTTP_OK && stateCode != HttpURLConnection.HTTP_PARTIAL) {
+                System.out.println("Error Code: " + stateCode);
+                return -2;
+            } else if (stateCode >= 400) {
+            	System.out.println("Error Code: " + stateCode);
+                return -2;
+            } else {
+                //è·å–é•¿åº¦
+                fileLength = conn.getContentLength();
+                System.out.println("FileLength: " + fileLength);
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fileLength;
+    }
 }
